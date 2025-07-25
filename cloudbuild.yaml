@@ -1,30 +1,18 @@
 steps:
-  # Step 1: Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '-t'
-      - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/backend-repo/backend-image:$SHORT_SHA'
-      - '.'
-
-  # Step 2: Push to Artifact Registry
+    args: ['build','-t','asia-southeast2-docker.pkg.dev/other-brain-golang/backend-repo/runner','.']
   - name: 'gcr.io/cloud-builders/docker'
+    args: ['push','asia-southeast2-docker.pkg.dev/other-brain-golang/backend-repo/runner']
+  - name: 'gcr.io/cloud-builders/gcloud'
     args:
-      - push
-      - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/backend-repo/backend-image:$SHORT_SHA'
-
-  # Step 3: Deploy to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - run
-      - deploy
-      - backend-runner
-      - '--image=asia-southeast2-docker.pkg.dev/$PROJECT_ID/backend-repo/backend-image:$SHORT_SHA'
-      - '--region=asia-southeast2'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
+      [
+        'run','deploy','runner',
+        '--image','asia-southeast2-docker.pkg.dev/other-brain-golang/backend-repo/runner',
+        '--region','asia-southeast2',
+        '--platform','managed',
+        '--allow-unauthenticated'
+      ]
 options:
   logging: CLOUD_LOGGING_ONLY
 images:
-  - 'asia-southeast2-docker.pkg.dev/$PROJECT_ID/backend-repo/backend-image:$SHORT_SHA'
+  -  'asia-southeast2-docker.pkg.dev/other-brain-golang/backend-repo/runner'
